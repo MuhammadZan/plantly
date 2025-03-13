@@ -20,7 +20,7 @@ export const uploadImage = async (file: File) => {
     var requestOptions = {
       method: "POST",
       headers: myHeaders,
-      body: JSON.stringify(formdata),
+      body: formdata,
     };
 
     const res = await fetch("https://api.imgur.com/3/image", requestOptions);
