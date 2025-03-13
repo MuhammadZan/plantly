@@ -1,14 +1,9 @@
-export const MONGO_URI = process.env.MONGODB_URL as string;
-export const JWT_SECRET = process.env.JWT_SECRET as string;
-export const dbName = process.env.DBNAME as string;
-export const APP_ID = process.env.NEXT_PUBLIC_APP_ID as string;
-export const APP_KEY = process.env.NEXT_PUBLIC_APP_KEY as string;
-export const APP_SECRET = process.env.APP_SECRET as string;
-export const APP_CLUSTER = process.env.NEXT_PUBLIC_APP_CLUSTER as string;
-export const APP_CHANNEL = process.env.NEXT_PUBLIC_APP_PUSHER_CHANNEL as string;
-export const AUTH_EMAIL = process.env.AUTH_EMAIL as string;
-export const AUTH_PASS = process.env.AUTH_PASS as string;
-export const GEOAPIFY_API_KEY = process.env.NEXT_PUBLIC_APP_GEOAPIFY_API_KEY as string;
+export const MONGO_URI = process.env.MONGODB_URL!;
+export const JWT_SECRET = process.env.JWT_SECRET!;
+export const dbName = process.env.DBNAME!;
+export const IMGUR_CLIENT_ID = process.env.NEXT_PUBLIC_APP_IMGUR_CLIENT_ID!;
+export const AUTH_EMAIL = process.env.AUTH_EMAIL!;
+export const AUTH_PASS = process.env.AUTH_PASS!;
 export const ORDER_CREATE = {
   subject: "New Pizza Order Received!",
   message: `

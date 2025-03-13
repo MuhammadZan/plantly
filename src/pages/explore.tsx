@@ -1,16 +1,13 @@
 import React from "react";
+import { ProductProps } from "@/components/productCard";
+import { ProductCardComponent } from "@/components/search/results";
 import p1 from "@/app/images/plant1.png";
 import p2 from "@/app/images/plant2.png";
 import p3 from "@/app/images/plant3.png";
 import p4 from "@/app/images/plant4.png";
 import p5 from "@/app/images/plant5.png";
 import p6 from "@/app/images/plant6.png";
-import stem from "@/app/images/stem.png";
-import { ProductProps } from "../productCard";
-import Image from "next/image";
-import { Cart, Favourit } from "../Icons";
 import { BRILLANT_REGULAR } from "@/app/fonts";
-import Link from "next/link";
 const products: ProductProps[] = [
   {
     image: p1,
@@ -48,8 +45,20 @@ const products: ProductProps[] = [
     description: "lorem ipsum set emmit",
     price: 699,
   },
+  {
+    image: p3,
+    title: "lorem ipsum",
+    description: "lorem ipsum set emmit",
+    price: 449,
+  },
+  {
+    image: p4,
+    title: "lorem ipsum",
+    description: "lorem ipsum set emmit",
+    price: 599,
+  },
 ];
-const Results = () => {
+const Explore = () => {
   return (
     <div>
       <h1
@@ -58,7 +67,7 @@ const Results = () => {
           BRILLANT_REGULAR.className
         }
       >
-        Search Results
+        Explore
         <div className="absolute -bottom-2 h-1 w-24 bg-primary left-1/2 -translate-x-1/2"></div>
       </h1>
       <p className="text-center mt-5">
@@ -72,30 +81,4 @@ const Results = () => {
     </div>
   );
 };
-export const ProductCardComponent = ({
-  image,
-  title,
-  price,
-  description,
-}: ProductProps) => (
-  <div className="backdrop-blur-sm">
-    <Link href={"/product/ornamental-plant"}>
-      <div className="bg-product flex justify-center items-center h-[300px] w-[300px] relative">
-        <span className="absolute top-5 right-5">
-          <Favourit />
-        </span>
-        <Image
-          src={image}
-          alt={description}
-          className="w-[80%] h-[80%] object-contain"
-        />
-      </div>
-    </Link>
-    <div className="flex justify-between">
-      <h1 className="text-md">{title}</h1>
-      <Cart />
-    </div>
-    <p className="text-primary">Rs. {price}/-</p>
-  </div>
-);
-export default Results;
+export default Explore;

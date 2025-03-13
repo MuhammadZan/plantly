@@ -7,16 +7,21 @@ import { request } from "@/services/apiService";
 import { AxiosResponse } from "axios";
 import { useUtility } from "@/context/loaderContext";
 import { AnimatePresence, motion } from "framer-motion";
+import Image from "next/image";
+import p1 from "@/app/images/plant1.png";
+import { BRILLANT_REGULAR } from "@/app/fonts";
+import { uploadImage } from "@/utils/uploadImage";
 const Index = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const [products, setProduct] = useState<IProduct[]>([]);
-  const { setLoading } = useUtility();
+  const { setLoading, toast } = useUtility();
+  const [image, setImage] = useState<File | null>(null);
   const [productData, setProductData] = useState<Partial<IProduct> | null>({
     name: "",
     price: 0,
     description: "",
     image: "",
-    type: "main",
+    type: "plant",
   });
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -28,6 +33,10 @@ const Index = () => {
   const submitForm = async () => {
     try {
       setLoading(true);
+      let link = "";
+      if (image) {
+        await uploadImage(image);
+      }
       if (isUpdate) {
         await request("product/manage", "put", productData);
         setProduct((pre) => {
@@ -43,10 +52,13 @@ const Index = () => {
         });
         setVisible(false);
       } else {
+        if (!link) {
+          toast("Image is required", "error");
+          return;
+        }
         const res: AxiosResponse = await request("product/manage", "post", {
           ...productData,
-          image:
-            "https://www.foodandwine.com/thmb/S3uWU7b_pecrL_sQ7jmwo6PeWvE=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/Aruba-Ariba-FT-RECIPE0522-53c306e2a600404ca19eb8a8e549071e.jpg",
+          image: link,
         });
         setProduct((pre) => {
           pre.push(res.data as IProduct);
@@ -55,6 +67,7 @@ const Index = () => {
         setVisible(false);
       }
     } catch (error) {
+      toast("Something went wrong", "error");
       console.log(error);
     } finally {
       setLoading(false);
@@ -90,90 +103,143 @@ const Index = () => {
       setProductData(null);
     }
   }, [visible]);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  useEffect(() => {
+    if (image) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(image);
+    } else {
+      setImagePreview(null);
+    }
+  }, [image]);
   return (
     <>
       <Model
+        className="w-[1000px] h-fit"
         componenet={
           <div className="p-5">
-            <h1 className="text-xl font-bold text-primary mb-5 text-center">
+            <h1
+              className={
+                "text-xl font-bold text-primary mb-5 " +
+                BRILLANT_REGULAR.className
+              }
+            >
               {isUpdate ? "Update Product" : "Add Product"}
             </h1>
-            <div className="flex flex-col gap-4">
-              <div className="flex flex-col">
-                <label htmlFor="name" className="font-semibold">
-                  Product Name *
-                </label>
+            <div className="flex items-center gap-20 justify-center ">
+              <div className="p-5 rounded-full bg-product w-[300px] h-[400px] relative overflow-hidden shadow-lg shadow-black/20">
                 <input
-                  type="text"
-                  placeholder="Product Name"
-                  value={productData?.name}
-                  name="name"
-                  onChange={(e) => {
-                    setProductData((pre) => ({
-                      ...pre,
-                      [e.target.name]: e.target.value,
-                    }));
-                  }}
-                  className="border p-2 rounded-md focus:outline-primary"
+                  type="file"
+                  id="image"
+                  onChange={(e) =>
+                    setImage(e.target.files && e.target.files[0])
+                  }
+                  className="absolute w-full h-full hidden"
+                  accept="image/png"
                 />
+                <div className="opacity-0 hover:opacity-100 bg-black/40 transition-all duration-300 absolute w-full h-full top-0 left-0 flex items-center justify-center">
+                  <Icon
+                    icon={"hugeicons:image-upload-01"}
+                    className="h-8 w-8 text-white cursor-pointer"
+                    onClick={() => document.getElementById("image")?.click()}
+                  />
+                </div>
+                {productData?.image || imagePreview ? (
+                  <img
+                    src={productData?.image || imagePreview || ""}
+                    className="w-full h-full object-contain"
+                    alt=""
+                  />
+                ) : (
+                  <div className="w-full h-full items-center justify-center flex flex-col">
+                    <Icon icon={"hugeicons:plant-02"} className="w-40 h-40 text-gray-600" />
+                    <h1>Please Upload Image</h1>
+                  </div>
+                )}
               </div>
-              <div className="flex flex-col">
-                <label htmlFor="price" className="font-semibold">
-                  Price *
-                </label>
-                <input
-                  type="number"
-                  value={productData?.price}
-                  name="price"
-                  onChange={(e) => {
-                    setProductData((pre) => ({
-                      ...pre,
-                      [e.target.name]: e.target.value,
-                    }));
-                  }}
-                  className="border p-2 rounded-md focus:outline-primary"
-                />
+              <div className="flex flex-col gap-4 w-[300px]">
+                <div className="flex flex-col">
+                  <label htmlFor="name" className="font-semibold">
+                    Product Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Product Name"
+                    value={productData?.name}
+                    name="name"
+                    onChange={(e) => {
+                      setProductData((pre) => ({
+                        ...pre,
+                        [e.target.name]: e.target.value,
+                      }));
+                    }}
+                    className="border p-2 rounded-md focus:outline-primary"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="price" className="font-semibold">
+                    Price *
+                  </label>
+                  <input
+                    type="number"
+                    value={productData?.price}
+                    name="price"
+                    onChange={(e) => {
+                      setProductData((pre) => ({
+                        ...pre,
+                        [e.target.name]: e.target.value,
+                      }));
+                    }}
+                    className="border p-2 rounded-md focus:outline-primary"
+                  />
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="type" className="font-semibold">
+                    Item Type *
+                  </label>
+                  <select
+                    value={productData?.type}
+                    name="type"
+                    className="border p-2 rounded-md focus:outline-primary"
+                    onChange={(e) => {
+                      setProductData((pre) => ({
+                        ...pre,
+                        [e.target.name]: e.target.value,
+                      }));
+                    }}
+                  >
+                    <option value="plant">Plant</option>
+                    <option value="pot">Pot</option>
+                  </select>
+                </div>
+                <div className="flex flex-col">
+                  <label htmlFor="description" className="font-semibold">
+                    Description *
+                  </label>
+                  <textarea
+                    value={productData?.description}
+                    name="description"
+                    onChange={(e) => {
+                      setProductData((pre) => ({
+                        ...pre,
+                        [e.target.name]: e.target.value,
+                      }));
+                    }}
+                    placeholder="Description..."
+                    className="border p-2 rounded-md focus:outline-primary h-[80px]"
+                  />
+                </div>
+                <div className="flex justify-end">
+                  <Button
+                    text={isUpdate ? "Update Product" : "Add Product"}
+                    onClick={submitForm}
+                    className="bg-primary text-white w-full rounded"
+                  />
+                </div>
               </div>
-              <div className="flex flex-col">
-                <label htmlFor="type" className="font-semibold">
-                  Item Type *
-                </label>
-                <select
-                  value={productData?.type}
-                  name="type"
-                  className="border p-2 rounded-md focus:outline-primary"
-                  onChange={(e) => {
-                    setProductData((pre) => ({
-                      ...pre,
-                      [e.target.name]: e.target.value,
-                    }));
-                  }}
-                >
-                  <option value="main">Main</option>
-                  <option value="side">Side</option>
-                </select>
-              </div>
-              <div className="flex flex-col">
-                <label htmlFor="description" className="font-semibold">
-                  Description *
-                </label>
-                <textarea
-                  value={productData?.description}
-                  name="description"
-                  onChange={(e) => {
-                    setProductData((pre) => ({
-                      ...pre,
-                      [e.target.name]: e.target.value,
-                    }));
-                  }}
-                  placeholder="Description..."
-                  className="border p-2 rounded-md focus:outline-primary h-[80px]"
-                />
-              </div>
-              <Button
-                text={isUpdate ? "Update Product" : "Add Product"}
-                onClick={submitForm}
-              />
             </div>
           </div>
         }
@@ -197,6 +263,7 @@ const Index = () => {
                 });
                 setVisible(true);
               }}
+              className="border text-white bg-primary"
             />
           </div>
         </div>

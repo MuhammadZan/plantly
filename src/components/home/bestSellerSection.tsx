@@ -10,6 +10,7 @@ import { ProductProps } from "../productCard";
 import Image from "next/image";
 import { Cart, Favourit } from "../Icons";
 import { BRILLANT_REGULAR } from "@/app/fonts";
+import { ProductCardComponent } from "../search/results";
 const products: ProductProps[] = [
   {
     image: p1,
@@ -71,28 +72,4 @@ const BestSellerSection = () => {
     </div>
   );
 };
-const ProductCardComponent = ({
-  image,
-  title,
-  price,
-  description,
-}: ProductProps) => (
-  <div className="backdrop-blur-sm">
-    <div className="bg-product flex justify-center items-center h-[300px] w-[300px] relative">
-      <span className="absolute top-5 right-5">
-        <Favourit />
-      </span>
-      <Image
-        src={image}
-        alt={description}
-        className="w-[80%] h-[80%] object-contain"
-      />
-    </div>
-    <div className="flex justify-between">
-      <h1 className="text-md">{title}</h1>
-      <Cart />
-    </div>
-    <p className="text-primary">Rs. {price}/-</p>
-  </div>
-);
 export default BestSellerSection;

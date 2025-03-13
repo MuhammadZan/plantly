@@ -18,7 +18,7 @@ const Header = () => {
           <div className="flex gap-10 item-center">
             {[
               { link: "/", text: "home" },
-              { link: "/products", text: "product" },
+              { link: "/explore", text: "product" },
               { link: "/contact", text: "contact" },
               { link: "/news", text: "news" },
             ].map(({ link, text }, index) => (

@@ -89,7 +89,7 @@ const SideBar = () => {
             ))}
           </ul>
         </div>
-        <Button text="Logout" onClick={logout} />
+        <Button text="Logout" onClick={logout} className="bg-primary w-full text-white" />
       </div>
     </div>
   );

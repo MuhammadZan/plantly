@@ -26,7 +26,7 @@ export const UtilityProvider: React.FC<IUtilityProvider> = ({ children }) => {
   const toast = (message: string, varient?: "success" | "error" | "alert") => {
     setShowToast(true);
     setToastMessage(message);
-    verient && setVerient(verient);
+    varient && setVerient(varient);
     setTimeout(() => {
       setShowToast(false);
       setToastMessage("");
@@ -40,7 +40,7 @@ export const UtilityProvider: React.FC<IUtilityProvider> = ({ children }) => {
         break;
       }
       case "error": {
-        setToastStyle("bg-red-800 text-white");
+        setToastStyle("text-red-800");
         break;
       }
       case "alert": {
@@ -48,7 +48,7 @@ export const UtilityProvider: React.FC<IUtilityProvider> = ({ children }) => {
         break;
       }
       default: {
-        setToastStyle("bg-white text-black");
+        setToastStyle("text-black");
         break;
       }
     }
@@ -90,9 +90,10 @@ export const UtilityProvider: React.FC<IUtilityProvider> = ({ children }) => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 30 }}
             transition={{ duration: 0.3, type: "keyframes" }}
-            className={`fixed top-5 right-5 ${toastStyle} overflow-hidden p-5 shadow-xl uppercase text-lg w-fit rounded-lg border z-50`}
+            className={`fixed top-5 right-5 ${toastStyle} overflow-hidden p-5 py-2 shadow-xl w-fit rounded-lg border z-[999] min-w-[300px] bg-white`}
           >
-            <h1>{toastMessage}</h1>
+            <span className="uppercase">{verient}</span>
+            <p className="capitalize">{toastMessage}</p>
           </motion.div>
         )}
       </AnimatePresence>

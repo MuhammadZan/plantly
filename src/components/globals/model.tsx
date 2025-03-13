@@ -44,7 +44,7 @@ const Model: React.FC<modelProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -30 }}
             transition={{ duration: 0.3, type: "keyframes" }}
-            className={`absolute z-20 bg-white rounded-lg w-[550px] max-h-[500px] h-fit overflow-x-hidden overflow-y-scroll border ${className} shadow-xl`}
+            className={`absolute z-20 bg-white rounded-lg min-w-[550px] min-h-[500px] h-fit overflow-x-hidden overflow-y-scroll border ${className} shadow-xl`}
           >
             <div className="flex justify-end">
               <span
