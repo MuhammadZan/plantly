@@ -9,7 +9,7 @@ export const uploadImage = async (file: File) => {
     }
     var myHeaders = new Headers();
     myHeaders.append("Authorization", `Client-ID ${IMGUR_CLIENT_ID}`);
-    myHeaders.append("content-type", "multipart/form-data");
+    // myHeaders.append("content-type", "multipart/form-data");
 
     var formdata = new FormData();
     formdata.append("image", file, "GHJQTpX.jpeg");
