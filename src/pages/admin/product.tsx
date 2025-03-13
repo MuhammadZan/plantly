@@ -24,18 +24,18 @@ const Index = () => {
     type: "plant",
   });
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const setProductToUpdate = (product: IProduct) => {
     setProductData(product);
     setIsUpdate(true);
     setVisible(true);
   };
+
   const submitForm = async () => {
     try {
       setLoading(true);
       let link = "";
       if (image) {
-        await uploadImage(image);
+        link = await uploadImage(image);
       }
       if (isUpdate) {
         await request("product/manage", "put", productData);
@@ -64,6 +64,15 @@ const Index = () => {
           pre.push(res.data as IProduct);
           return pre;
         });
+        setImagePreview(null);
+        setImage(null);
+        setProductData({
+          image: "",
+          description: "",
+          price: 0,
+          type: "plant",
+          name: "",
+        });
         setVisible(false);
       }
     } catch (error) {
@@ -73,6 +82,7 @@ const Index = () => {
       setLoading(false);
     }
   };
+
   const deleteProduct = async (id: string) => {
     try {
       const res = await request(`product/${id}`, "delete");
@@ -155,7 +165,10 @@ const Index = () => {
                   />
                 ) : (
                   <div className="w-full h-full items-center justify-center flex flex-col">
-                    <Icon icon={"hugeicons:plant-02"} className="w-40 h-40 text-gray-600" />
+                    <Icon
+                      icon={"hugeicons:plant-02"}
+                      className="w-40 h-40 text-gray-600"
+                    />
                     <h1>Please Upload Image</h1>
                   </div>
                 )}
