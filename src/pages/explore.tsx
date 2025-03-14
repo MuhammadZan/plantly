@@ -1,64 +1,21 @@
-import React from "react";
-import { ProductProps } from "@/components/productCard";
-import { ProductCardComponent } from "@/components/search/results";
-import p1 from "@/app/images/plant1.png";
-import p2 from "@/app/images/plant2.png";
-import p3 from "@/app/images/plant3.png";
-import p4 from "@/app/images/plant4.png";
-import p5 from "@/app/images/plant5.png";
-import p6 from "@/app/images/plant6.png";
+import React, { useEffect, useState } from "react";
+import ProductCardComponent from "@/components/ProductComponentCard";
 import { BRILLANT_REGULAR } from "@/app/fonts";
-const products: ProductProps[] = [
-  {
-    image: p1,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 500,
-  },
-  {
-    image: p2,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 499,
-  },
-  {
-    image: p3,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 449,
-  },
-  {
-    image: p4,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 599,
-  },
-  {
-    image: p5,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 530,
-  },
-  {
-    image: p6,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 699,
-  },
-  {
-    image: p3,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 449,
-  },
-  {
-    image: p4,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 599,
-  },
-];
+import { IProduct } from "@/model/Product";
+import { request } from "@/services/apiService";
 const Explore = () => {
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const getAllProducts = async () => {
+    try {
+      const res = await request("product/get");
+      setProducts(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getAllProducts();
+  }, []);
   return (
     <div>
       <h1
