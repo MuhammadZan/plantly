@@ -61,8 +61,6 @@ const ProductSection: React.FC<ProductSectionProps> = ({ products }) => {
             slidesPerView={4}
             autoplay={{ delay: 3000 }}
             loop={true}
-            onSlideChange={() => console.log("slide change")}
-            onSwiper={(swiper) => console.log(swiper)}
           >
             {product.map((p, index: number) => (
               <SwiperSlide key={index}>

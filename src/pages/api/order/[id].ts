@@ -1,7 +1,5 @@
 import { IOrder, Order } from "@/model/Order";
-import { IUser, User } from "@/model/User";
-import { sendEmail } from "@/services/email-services";
-import { ORDER_STATUS } from "@/utils/constant";
+import { IUser } from "@/model/User";
 import { connectToDb } from "@/utils/db";
 import { authenticateUser, response } from "@/utils/helper";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -16,11 +14,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method?.toLocaleLowerCase() === "put") {
       const { _id, status }: Partial<IOrder> = req.body;
       const order = await Order.findByIdAndUpdate(_id, { status });
-      const customer = await User.findById(order?.userId);
-      const html = ORDER_STATUS.message
-        .replace("{{orderId}}", `${_id}`)
-        .replace("{{status}}", `${status}`);
-      await sendEmail(html, ORDER_STATUS.subject, customer?.email);
+
       return response(res, 200, order);
     } else if (req.method?.toLocaleLowerCase() === "delete") {
       const { id } = req.query;

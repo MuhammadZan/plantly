@@ -3,7 +3,6 @@ import { IMGUR_CLIENT_ID } from "./constant";
 
 export const uploadImage = async (file: File): Promise<string> => {
   try {
-    console.log(file);
     if (!file) {
       return "";
     }
@@ -14,7 +13,6 @@ export const uploadImage = async (file: File): Promise<string> => {
     formdata.append("type", "image");
     formdata.append("title", "Simple upload");
     formdata.append("description", "This is a simple image upload in Imgur");
-    console.log(formdata);
     var requestOptions = {
       method: "POST",
       headers: myHeaders,

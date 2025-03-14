@@ -90,7 +90,7 @@ const Index = () => {
                 </span>
                 <img
                   src={item.product.image}
-                  className="w-[100px] h-[100px]"
+                  className="w-[100px] h-[100px] object-contain"
                   alt="pizza card"
                 />
                 <div>

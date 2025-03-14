@@ -28,7 +28,7 @@ const DrawChart = ({
   tooltipText,
   labels,
   data,
-  colors = "#E16556",
+  colors = "#588534",
 }: {
   tooltipText: string;
   labels: string[];

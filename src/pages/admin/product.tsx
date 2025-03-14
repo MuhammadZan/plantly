@@ -46,7 +46,7 @@ const Index = () => {
             elem.type = productData.type as string;
             elem.description = productData.description as string;
             elem.price = productData.price as number;
-            elem.image = productData.image as string;
+            elem.image = link || (productData.image as string);
           }
           return pre;
         });
@@ -64,17 +64,17 @@ const Index = () => {
           pre.push(res.data as IProduct);
           return pre;
         });
-        setImagePreview(null);
-        setImage(null);
-        setProductData({
-          image: "",
-          description: "",
-          price: 0,
-          type: "plant",
-          name: "",
-        });
-        setVisible(false);
       }
+      setImagePreview(null);
+      setImage(null);
+      setProductData({
+        image: "",
+        description: "",
+        price: 0,
+        type: "plant",
+        name: "",
+      });
+      setVisible(false);
     } catch (error) {
       toast("Something went wrong", "error");
       console.log(error);
@@ -271,7 +271,7 @@ const Index = () => {
                   name: "",
                   price: 0,
                   description: "",
-                  type: "main",
+                  type: "plant",
                   image: "",
                 });
                 setVisible(true);
@@ -290,7 +290,7 @@ const Index = () => {
         <div className="mt-4 flex flex-col gap-2">
           <div className="flex rounded-lg bg-red-100 w-full justify-between px-5 py-3">
             <span className="w-[5%] text-center">Sr</span>
-            <span className="w-[7%] text-center">Avatar</span>
+            <span className="w-[7%] text-center">Image</span>
             <span className="w-[18.56%] text-center">Product Name</span>
             <span className="w-[14.28%] text-center">Product Type</span>
             <span className="w-[10%] text-center">Product Price</span>
@@ -315,7 +315,7 @@ const Index = () => {
                   # {index + 1}
                 </span>
                 <span className="w-[7%] flex justify-center border-r text-orange-500">
-                  <img src={product.image} className="h-7 w-7 rounded-full" />
+                  <img src={product.image} className="h-12 w-12 rounded-full object-contain" />
                 </span>
                 <span className="w-[18.56%] text-center border-r text-orange-500 capitalize">
                   {product.name}

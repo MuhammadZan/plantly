@@ -1,55 +1,21 @@
-import React from "react";
-import p1 from "@/app/images/plant1.png";
-import p2 from "@/app/images/plant2.png";
-import p3 from "@/app/images/plant3.png";
-import p4 from "@/app/images/plant4.png";
-import p5 from "@/app/images/plant5.png";
-import p6 from "@/app/images/plant6.png";
-import stem from "@/app/images/stem.png";
-import { ProductProps } from "../productCard";
-import Image from "next/image";
-import { Cart, Favourit } from "../Icons";
+import React, { useEffect, useState } from "react";
 import { BRILLANT_REGULAR } from "@/app/fonts";
-import Link from "next/link";
-const products: ProductProps[] = [
-  {
-    image: p1,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 500,
-  },
-  {
-    image: p2,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 499,
-  },
-  {
-    image: p3,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 449,
-  },
-  {
-    image: p4,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 599,
-  },
-  {
-    image: p5,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 530,
-  },
-  {
-    image: p6,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 699,
-  },
-];
+import { IProduct } from "@/model/Product";
+import { request } from "@/services/apiService";
+import ProductCardComponent from "../ProductComponentCard";
 const Results = () => {
+  const [products, setProducts] = useState<IProduct[]>([]);
+  const getAllProducts = async () => {
+    try {
+      const res = await request("porduct/get");
+      setProducts(res.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getAllProducts();
+  }, []);
   return (
     <div>
       <h1
@@ -72,30 +38,5 @@ const Results = () => {
     </div>
   );
 };
-export const ProductCardComponent = ({
-  image,
-  title,
-  price,
-  description,
-}: ProductProps) => (
-  <div className="backdrop-blur-sm">
-    <Link href={"/product/ornamental-plant"}>
-      <div className="bg-product flex justify-center items-center h-[300px] w-[300px] relative">
-        <span className="absolute top-5 right-5">
-          <Favourit />
-        </span>
-        <Image
-          src={image}
-          alt={description}
-          className="w-[80%] h-[80%] object-contain"
-        />
-      </div>
-    </Link>
-    <div className="flex justify-between">
-      <h1 className="text-md">{title}</h1>
-      <Cart />
-    </div>
-    <p className="text-primary">Rs. {price}/-</p>
-  </div>
-);
+
 export default Results;

@@ -31,7 +31,7 @@ export const UtilityProvider: React.FC<IUtilityProvider> = ({ children }) => {
       setShowToast(false);
       setToastMessage("");
       setVerient("success");
-    }, 4000);
+    }, 2000);
   };
   useEffect(() => {
     switch (verient) {

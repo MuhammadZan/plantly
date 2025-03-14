@@ -8,10 +8,10 @@ import { NextApiRequest, NextApiResponse } from "next";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectToDb();
-    // const user: IUser | null = await authenticateUser(req);
-    // if (!user) {
-    //   return response(res, 401, { message: "Authentication failed" });
-    // }
+    const user: IUser | null = await authenticateUser(req);
+    if (!user) {
+      return response(res, 401, { message: "Authentication failed" });
+    }
     if (req.method?.toLowerCase() === "get") {
       const quickOrders = await Order.find(
         { status: "pending" },
@@ -62,7 +62,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         quickOrders,
         userCount,
         menuCount,
-        totalSales: totalSales[0].totalSales,
+        totalSales: totalSales[0]?.totalSales||0,
         orderCount,
         sales,
       });

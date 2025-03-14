@@ -15,7 +15,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       .populate("userId")
       .populate("items.product")
       .sort({ createdAt: -1 });
-    console.log(orders);
     return response(res, 200, orders);
   } catch (error) {
     console.log(error);

@@ -15,13 +15,12 @@ import { BRILLANT_REGULAR } from "@/app/fonts";
 import Button from "@/components/globals/button";
 import { Icon } from "@/components/Icons";
 import Image from "next/image";
-import p1 from "@/app/images/plant1.png";
 interface ICartProvider {
   children: ReactNode;
 }
 export interface ICart extends IItems {
   title: string;
-  description: string;
+  description?: string;
   image: string;
 }
 interface ICartContext {
@@ -72,13 +71,12 @@ export const CartProvider: React.FC<ICartProvider> = ({ children }) => {
             image: item.image as string,
             product: item._id as any,
             quantity: 1,
-            description: item.description as string,
             unitCost: item.price as number,
           },
         ];
       }
     });
-    toast(`${item.name} added to cart`);
+    toast(`${item.name} added to cart`, "success");
   };
 
   const increaseItem = (product: string) => {
@@ -180,37 +178,59 @@ export const CartProvider: React.FC<ICartProvider> = ({ children }) => {
                 </span>
               </div>
               <div className="flex flex-col gap-5 h-[80%] overflow-y-scroll">
-                <div className="flex justify-between items-center p-2 rounded-md bg-product">
-                  <div className="flex gap-2 items-center">
-                    <div className="w-24 h-24 bg-white rounded-lg">
-                      <Image
-                        src={p1}
-                        className="w-full h-full object-contain"
-                        alt="cart-item"
-                      />
-                    </div>
-                    <div>
-                      <h1 className="text-md font-bold">Lorem ipsum dolor</h1>
-                      <p className="text-sm">Lorem ipsum dolor sit...</p>
-                      <p className="text-primary font-bold">Rs. 500/-</p>
-                    </div>
-                  </div>
-                  <div>
-                    <span className="h-5 w-5 rounded bg-white cursor-pointer hover:text-primary flex justify-center items-center">
-                      +
-                    </span>
-                    <span className="h-5 w-5 rounded flex justify-center items-center">
-                      1
-                    </span>
-                    <span className="h-5 w-5 rounded bg-white cursor-pointer hover:text-primary flex justify-center items-center">
-                      -
-                    </span>
-                  </div>
-                </div>
+                <AnimatePresence>
+                  {cart.map((item, index) => (
+                    <motion.div
+                      initial={{ opacity: 0, x: 100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 100 }}
+                      transition={{ type: "keyframes", duration: 0.6 }}
+                      key={index}
+                      className="flex justify-between items-center p-2 rounded-md bg-product"
+                    >
+                      <div className="flex gap-2 items-center">
+                        <div className="w-24 h-24 bg-white rounded-lg">
+                          <Image
+                            src={item.image}
+                            width={96}
+                            height={96}
+                            className="w-full h-full object-contain"
+                            alt="cart-item"
+                          />
+                        </div>
+                        <div>
+                          <h1 className="text-md font-bold">{item.title}</h1>
+                          {/* <p className="text-sm">{item.}</p> */}
+                          <p className="text-primary font-bold">
+                            Rs. {item.unitCost}/-
+                          </p>
+                        </div>
+                      </div>
+                      <div>
+                        <span
+                          onClick={() => increaseItem(String(item.product))}
+                          className="h-5 w-5 rounded bg-white cursor-pointer hover:text-primary flex justify-center items-center"
+                        >
+                          +
+                        </span>
+                        <span className="h-5 w-5 rounded flex justify-center items-center">
+                          {item.quantity}
+                        </span>
+                        <span
+                          onClick={() => decreaseItem(String(item.product))}
+                          className="h-5 w-5 rounded bg-white cursor-pointer hover:text-primary flex justify-center items-center"
+                        >
+                          -
+                        </span>
+                      </div>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
               <div className="bg-white w-full h-[15%] flex items-center">
                 <Button
                   className="text-white bg-primary w-full rounded"
+                  onClick={confirmOrder}
                   text="Check Out"
                 />
               </div>
