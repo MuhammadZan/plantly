@@ -23,11 +23,9 @@ export const uploadImage = async (file: File): Promise<string> => {
 
     const res = await fetch("https://api.imgur.com/3/image", requestOptions);
     let link = "";
-    const data = await res.json();
-    console.log(data);
-    if (res.ok) link = data.link;
+    const { data, success } = await res.json();
+    if (success) link = data.link;
     else throw new Error("Failed");
-    console.log(link)
     return link;
   } catch (error: any) {
     alert(error.message);
