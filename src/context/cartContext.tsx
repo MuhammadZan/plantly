@@ -177,14 +177,18 @@ export const CartProvider: React.FC<ICartProvider> = ({ children }) => {
                   />
                 </span>
               </div>
-              <div className="flex flex-col gap-5 h-[80%] overflow-y-scroll">
+              <div className="flex flex-col gap-5 h-[80%] overflow-y-scroll overflow-x-hidden">
                 <AnimatePresence>
                   {cart.map((item, index) => (
                     <motion.div
-                      initial={{ opacity: 0, x: 100 }}
+                      initial={{ opacity: 0, x: 50 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 100 }}
-                      transition={{ type: "keyframes", duration: 0.6 }}
+                      exit={{ opacity: 0, x: 50 }}
+                      transition={{
+                        type: "keyframes",
+                        duration: 0.6,
+                        delay: index * 0.2,
+                      }}
                       key={index}
                       className="flex justify-between items-center p-2 rounded-md bg-product"
                     >
@@ -196,6 +200,7 @@ export const CartProvider: React.FC<ICartProvider> = ({ children }) => {
                             height={96}
                             className="w-full h-full object-contain"
                             alt="cart-item"
+                            loading="lazy"
                           />
                         </div>
                         <div>

@@ -5,14 +5,38 @@ import { BRILLANT_REGULAR } from "@/app/fonts";
 import { Icon } from "@/components/Icons";
 import Button from "@/components/globals/button";
 import ProductSection from "@/components/home/productSection";
-const SingleProductPage = () => {
+import { GetServerSideProps } from "next";
+import { IProduct, Product } from "@/model/Product";
+import { connectToDb } from "@/utils/db";
+import { useCart } from "@/context/cartContext";
+export const getServerSideProps: GetServerSideProps = async (context) => {
+  const { id } = context.params as any;
+  let product: IProduct | null = null;
+  try {
+    await connectToDb();
+    product = await Product.findById(id);
+  } catch (error) {
+    console.log(error);
+  }
+  return {
+    props: { product: JSON.parse(JSON.stringify(product)) },
+  };
+};
+
+const SingleProductPage = ({ product }: { product: IProduct }) => {
+  const { addToCart } = useCart();
   return (
     <div className="min-h-screen p-10">
       <div className="flex">
         <div className="w-1/2">
           <div>{"home > product > ornamental plant"}</div>
           <div className="w-full h-[500px] bg-white rounded-xl mt-5 flex justify-center items-center">
-            <Image src={p1} alt=";" className="h-full object-contain" />
+            <img
+              src={product.image}
+              loading="lazy"
+              alt=""
+              className="h-full object-contain"
+            />
           </div>
         </div>
         <div className="w-1/2 p-10">
@@ -21,7 +45,7 @@ const SingleProductPage = () => {
               "text-3xl mt-10 font-semibold " + BRILLANT_REGULAR.className
             }
           >
-            Ornamental Plant
+            {product.name}
           </h1>
           <div className="flex items-center">
             <Icon icon="solar:star-bold-duotone" className="text-primary" />
@@ -31,13 +55,7 @@ const SingleProductPage = () => {
             <Icon icon="solar:star-bold-duotone" className="text-primary" />
             <div className="text-gray-400 ml-10 font-semibold">3K+ Sales</div>
           </div>
-          <p className="mt-10 text-gray-400">
-            Lorem ipsum dolor, sit amet consectetur adipisicing elit. Corporis
-            voluptas autem sit, in laudantium hic optio dolorum mollitia nostrum
-            ullam laborum dolore libero deleniti quas enim, repellat id? Atque
-            culpa odio pariatur. Sit voluptatum ut ratione debitis incidunt
-            consequuntur obcaecati.
-          </p>
+          <p className="mt-10 text-gray-400">{product.description}</p>
           <div className="flex gap-5 mt-10">
             <Button
               className="hover:bg-primary hover:text-white font-semibold border rounded"
@@ -60,11 +78,18 @@ const SingleProductPage = () => {
               text="XXL"
             />
           </div>
-          <Button text="Add To Cart" className="bg-primary mt-10 text-white" />
+          <Button
+            text="Add To Cart"
+            onClick={() => {
+              addToCart(product);
+            }}
+            className="bg-primary mt-10 text-white"
+          />
         </div>
       </div>
       <ProductSection />
-      <h1 className={"text-3xl font-bold "+BRILLANT_REGULAR.className}>Related Articles
+      <h1 className={"text-3xl font-bold " + BRILLANT_REGULAR.className}>
+        Related Articles
       </h1>
     </div>
   );

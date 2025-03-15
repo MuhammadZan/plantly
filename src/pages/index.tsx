@@ -1,25 +1,25 @@
-import React, { useEffect } from "react";
-import Header from "@/components/globals/header";
-import HeroSection from "@/components/home/heroSection";
-import ProductSection from "@/components/home/productSection";
-import CategorySection from "@/components/home/categorySection";
-import BestSellerSection from "@/components/home/bestSellerSection";
-import Work from "@/components/home/work";
-import NewsLetter from "@/components/home/newsLetter";
-import Footer from "@/components/globals/footer";
+import React, { Suspense, lazy } from "react";
+
+const HeroSection = lazy(() => import("@/components/home/heroSection"));
+const ProductSection = lazy(() => import("@/components/home/productSection"));
+const CategorySection = lazy(() => import("@/components/home/categorySection"));
+const BestSellerSection = lazy(
+  () => import("@/components/home/bestSellerSection")
+);
+const Work = lazy(() => import("@/components/home/work"));
+const NewsLetter = lazy(() => import("@/components/home/newsLetter"));
 
 const Index = () => {
-  useEffect(() => {
-    document.title = "Plantly";
-  }, []);
   return (
     <>
       <HeroSection />
-      <ProductSection />
-      <CategorySection />
-      <BestSellerSection />
-      <Work />
-      <NewsLetter/>
+      <Suspense fallback={<div>Loading...</div>}>
+        <ProductSection />
+        <CategorySection />
+        <BestSellerSection />
+        <Work />
+        <NewsLetter />
+      </Suspense>
     </>
   );
 };
