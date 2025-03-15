@@ -9,6 +9,7 @@ import { GetServerSideProps } from "next";
 import { IProduct, Product } from "@/model/Product";
 import { connectToDb } from "@/utils/db";
 import { useCart } from "@/context/cartContext";
+import Link from "next/link";
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params as any;
   let product: IProduct | null = null;
@@ -29,7 +30,13 @@ const SingleProductPage = ({ product }: { product: IProduct }) => {
     <div className="min-h-screen p-10">
       <div className="flex">
         <div className="w-1/2">
-          <div>{"home > product > ornamental plant"}</div>
+          <div>
+            <Link href={"/"}>home</Link>
+            {" > "}
+            <Link href={"/explore"}>product</Link>
+            {" > "}
+            <Link href={""}>{product.name}</Link>
+          </div>
           <div className="w-full h-[500px] bg-white rounded-xl mt-5 flex justify-center items-center">
             <Image
               src={product.image}
