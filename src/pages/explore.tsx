@@ -3,19 +3,27 @@ import ProductCardComponent from "@/components/ProductComponentCard";
 import { BRILLANT_REGULAR } from "@/app/fonts";
 import { IProduct } from "@/model/Product";
 import { request } from "@/services/apiService";
+import { useQuery } from "@tanstack/react-query";
 const Explore = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
   const getAllProducts = async () => {
     try {
       const res = await request("product/get");
-      setProducts(res.data);
+      return res.data;
     } catch (error) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    getAllProducts();
-  }, []);
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: getAllProducts,
+    refetchOnReconnect: true,
+  });
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center py-5 h-screen">
+        <div className="lds-dual-ring"></div>
+      </div>
+    );
   return (
     <div>
       <h1
@@ -31,7 +39,7 @@ const Explore = () => {
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat, in!
       </p>
       <div className="flex flex-wrap gap-10 mx-auto mt-10 justify-center relative z-10">
-        {products.map((product, index) => (
+        {(products as IProduct[]).map((product, index) => (
           <ProductCardComponent key={index} {...product} />
         ))}
       </div>

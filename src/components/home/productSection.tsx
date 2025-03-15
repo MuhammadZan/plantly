@@ -8,49 +8,27 @@ import p6 from "@/app/images/plant6.png";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Autoplay } from "swiper/modules";
-import { ProductProps } from "../productCard";
+import { IProduct } from "@/model/Product";
+import { request } from "@/services/apiService";
+import { useQuery } from "@tanstack/react-query";
 interface ProductSectionProps {
-  products?: ProductProps[];
+  products?: Partial<IProduct>[];
 }
-const product: ProductProps[] = [
-  {
-    image: p1,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 500,
-  },
-  {
-    image: p2,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 499,
-  },
-  {
-    image: p3,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 449,
-  },
-  {
-    image: p4,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 599,
-  },
-  {
-    image: p5,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 530,
-  },
-  {
-    image: p6,
-    title: "lorem ipsum",
-    description: "lorem ipsum set emmit",
-    price: 699,
-  },
-];
 const ProductSection: React.FC<ProductSectionProps> = ({ products }) => {
+  const getAllProducts = async () => {
+    try {
+      const res = await request("product/get");
+      return res.data;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const { data: product, isLoading } = useQuery({
+    queryKey: ["products"],
+    queryFn: getAllProducts,
+    refetchOnReconnect: true,
+  });
+  if (isLoading) return <></>;
   return (
     <>
       <div className="container mx-auto overflow-x-hidden p-10">
@@ -62,11 +40,11 @@ const ProductSection: React.FC<ProductSectionProps> = ({ products }) => {
             autoplay={{ delay: 3000 }}
             loop={true}
           >
-            {product.map((p, index: number) => (
+            {(product as IProduct[]).map((p, index: number) => (
               <SwiperSlide key={index}>
                 <ProductCard
                   image={p.image}
-                  title={p.title}
+                  name={p.name}
                   description={p.description}
                   price={p.price}
                 />

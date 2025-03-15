@@ -6,19 +6,23 @@ import Wrapper from "@/components/layout/wrapper";
 import { useRouter } from "next/router";
 import { UtilityProvider } from "@/context/loaderContext";
 import MainSite from "@/components/layout/main-site";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 const _app = ({ Component, pageProps }: AppProps) => {
+  const queryClient = new QueryClient();
   const router = useRouter();
   return (
     <UtilityProvider>
       <UserProvider>
         <CartProvider>
-          {router.pathname.includes("admin") ? (
-            <Wrapper component={<Component {...pageProps} />} />
-          ) : (
-            <MainSite>
-              <Component {...pageProps} />
-            </MainSite>
-          )}
+          <QueryClientProvider client={queryClient}>
+            {router.pathname.includes("admin") ? (
+              <Wrapper component={<Component {...pageProps} />} />
+            ) : (
+              <MainSite>
+                <Component {...pageProps} />
+              </MainSite>
+            )}
+          </QueryClientProvider>
         </CartProvider>
       </UserProvider>
     </UtilityProvider>

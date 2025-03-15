@@ -35,12 +35,13 @@ const SingleProductPage = ({ product }: { product: IProduct }) => {
             {" > "}
             <Link href={"/explore"}>product</Link>
             {" > "}
-            <Link href={""}>{product.name}</Link>
+            <Link href={""} className="lowercase">{product.name}</Link>
           </div>
           <div className="w-full h-[500px] bg-white rounded-xl mt-5 flex justify-center items-center">
             <Image
               src={product.image}
               height={500}
+              width={500}
               loading="lazy"
               alt=""
               className="h-full object-contain"

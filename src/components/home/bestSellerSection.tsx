@@ -3,20 +3,29 @@ import { BRILLANT_REGULAR } from "@/app/fonts";
 import ProductCardComponent from "@/components/ProductComponentCard";
 import { IProduct } from "@/model/Product";
 import { request } from "@/services/apiService";
+import { useQuery } from "@tanstack/react-query";
 
 const BestSellerSection = () => {
-  const [products, setProducts] = useState<IProduct[]>([]);
   const getAllProducts = async () => {
     try {
-      const res = await request("product/get");
-      setProducts(res.data);
+      const res = await request("product/top-products");
+      return res.data;
     } catch (error) {
       console.log(error);
     }
   };
-  useEffect(() => {
-    getAllProducts();
-  }, []);
+  const { data: products, isLoading } = useQuery({
+    queryKey: ["best-products"],
+    queryFn: getAllProducts,
+    refetchOnReconnect: true,
+    refetchOnWindowFocus: true,
+  });
+  if (isLoading)
+    return (
+      <div className="flex justify-center items-center py-5">
+        <div className="lds-dual-ring"></div>
+      </div>
+    );
   return (
     <div>
       <h1
@@ -32,7 +41,7 @@ const BestSellerSection = () => {
         Lorem ipsum dolor, sit amet consectetur adipisicing elit. Quaerat, in!
       </p>
       <div className="flex flex-wrap gap-10 w-2/3 mx-auto mt-10 justify-center relative z-10">
-        {products.map((product, index) => (
+        {(products as IProduct[]).map((product, index) => (
           <ProductCardComponent key={index} {...product} />
         ))}
       </div>
