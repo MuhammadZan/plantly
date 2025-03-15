@@ -31,8 +31,9 @@ const SingleProductPage = ({ product }: { product: IProduct }) => {
         <div className="w-1/2">
           <div>{"home > product > ornamental plant"}</div>
           <div className="w-full h-[500px] bg-white rounded-xl mt-5 flex justify-center items-center">
-            <img
+            <Image
               src={product.image}
+              height={500}
               loading="lazy"
               alt=""
               className="h-full object-contain"
