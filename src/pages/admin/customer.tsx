@@ -1,26 +1,37 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Icon } from "@iconify/react";
 import { IUser } from "@/model/User";
-import { request } from "@/services/apiService";
-import { useUtility } from "@/context/loaderContext";
 import { AnimatePresence, motion } from "framer-motion";
-import { useQuery } from "@apollo/client";
-import { GET_USERS } from "@/graphql/queries";
+import { useMutation, useQuery } from "@apollo/client";
+import { GET_USERS, DELETE_USER } from "@/graphql/queries";
 
 const Index = () => {
-  const { loading, error, data } = useQuery(GET_USERS);
-  if (loading) return <p>Loading...</p>;
+  const { loading, error, data, refetch } = useQuery(GET_USERS);
+  const [deleteUser] = useMutation(DELETE_USER, {
+    onCompleted: () => refetch(),
+  });
+  if (loading)
+    return (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.3, type: "keyframes" }}
+        className="w-screen h-screen flex justify-center items-center loader backdrop-blur-sm"
+      >
+        <div className="lds-dual-ring"></div>
+      </motion.div>
+    );
   if (error) return <p>Error: {error.message}</p>;
-  const deleteCustomer = async (id: string) => {
+  const { users } = data;
+  
+  const handleDelete = async (id: string) => {
     try {
-      await request(`auth/${id}`, "delete");
-      // setCustomers((pre) => pre.filter((c) => String(c._id) != id));
-    } catch (error) {
-      console.log(error);
+      await deleteUser({ variables: { _id: id } });
+    } catch (err) {
+      console.error("Error deleting user:", err);
     }
   };
-  const { users } = data;
-
   return (
     <>
       <div className="px-5 w-full mb-10`">
@@ -67,7 +78,7 @@ const Index = () => {
                   <span className="w-[14.28%] flex justify-center gap-2">
                     <span
                       className="p-2 rounded-lg border bg-gray-50 shadow-lg cursor-pointer"
-                      // onClick={() => deleteCustomer(String(customer._id))}
+                      onClick={() => handleDelete(String(customer._id))}
                     >
                       <Icon
                         icon="weui:delete-on-filled"

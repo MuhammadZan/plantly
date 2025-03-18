@@ -21,3 +21,8 @@ export const GET_PRODUCTS = gql`
     }
   }
 `;
+export const DELETE_USER = gql`
+  mutation DeleteUser($_id: String!) {
+    deleteUser(_id: $_id)
+  }
+`;

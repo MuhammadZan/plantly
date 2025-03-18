@@ -7,8 +7,7 @@ const resolvers = {
     users: async () => {
       try {
         await connectToDb();
-        const users = await User.find();
-        return users;
+        return await User.find();
       } catch (error) {
         throw new Error("Something went wrong");
       }
@@ -19,13 +18,83 @@ const resolvers = {
         return await Product.find();
       } catch (error) {
         console.log(error);
+        throw new Error("Something went wrong");
       }
     },
     searchUser: async (_: any, { value }: { value: string }) => {
       try {
         await connectToDb();
-        const users = await User.find({ fullName: value });
-        return users;
+        return await User.find({ fullName: new RegExp(value, "i") });
+      } catch (error) {
+        throw new Error("Something went wrong");
+      }
+    },
+  },
+  Mutation: {
+    createProduct: async (
+      _: any,
+      {
+        name,
+        image,
+        description,
+        price,
+        type,
+      }: {
+        name: string;
+        image: string;
+        description: string;
+        price: number;
+        type: string;
+      }
+    ) => {
+      try {
+        await connectToDb();
+        const newProduct = new Product({
+          name,
+          image,
+          description,
+          price,
+          type,
+        });
+        return await newProduct.save();
+      } catch (error) {
+        throw new Error("Something went wrong");
+      }
+    },
+    updateProduct: async (
+      _: any,
+      {
+        _id,
+        name,
+        image,
+        description,
+        price,
+        type,
+      }: {
+        _id: string;
+        name?: string;
+        image?: string;
+        description?: string;
+        price?: number;
+        type?: string;
+      }
+    ) => {
+      try {
+        await connectToDb();
+        return await Product.findByIdAndUpdate(
+          _id,
+          { name, image, description, price, type },
+          { new: true }
+        );
+      } catch (error) {
+        throw new Error("Something went wrong");
+      }
+    },
+    deleteProduct: async (_: any, { _id }: { _id: string }) => {
+      try {
+        await connectToDb();
+        const product = await Product.findByIdAndDelete(_id);
+        return product ? true : false;
       } catch (error) {
         throw new Error("Something went wrong");
       }
@@ -34,11 +103,7 @@ const resolvers = {
       try {
         await connectToDb();
         const user = await User.findByIdAndDelete(_id);
-        if (user) {
-          return true;
-        } else {
-          return false;
-        }
+        return user ? true : false;
       } catch (error) {
         throw new Error("Something went wrong");
       }
