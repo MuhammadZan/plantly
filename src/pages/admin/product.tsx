@@ -19,7 +19,7 @@ import { useMutation, useQuery } from "@apollo/client";
 const Index = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const { setLoading, toast } = useUtility();
-  const [image, setImage] = useState<File | null>(null);
+  const [imageToUpload, setImageToUpload] = useState<File | null>(null);
   const [productData, setProductData] = useState<Partial<IProduct> | null>({
     name: "",
     price: 0,
@@ -44,17 +44,17 @@ const Index = () => {
 
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   useEffect(() => {
-    if (image) {
+    if (imageToUpload) {
       const reader = new FileReader();
       reader.onloadend = () => {
         setImagePreview(reader.result as string);
       };
-      reader.readAsDataURL(image);
+      reader.readAsDataURL(imageToUpload);
     } else {
       setImagePreview(null);
     }
-  }, [image]);
-  const { loading, error, data, refetch } = useQuery(GET_PRODUCTS);
+  }, [imageToUpload]);
+  const { data, refetch } = useQuery(GET_PRODUCTS);
   const [deleteProduct] = useMutation(DELETE_PRODUCT, {
     onCompleted: () => {
       refetch();
@@ -69,7 +69,8 @@ const Index = () => {
       setVisible(false);
       setLoading(false);
     },
-    onError: () => {
+    onError: (error) => {
+      console.error(error.message);
       toast("Error creating product", "error");
       setVisible(false);
       setLoading(false);
@@ -83,7 +84,7 @@ const Index = () => {
       setLoading(false);
     },
     onError: () => {
-      toast("Error creating product", "error");
+      toast("Error updating product", "error");
       setVisible(false);
       setLoading(false);
     },
@@ -91,19 +92,36 @@ const Index = () => {
   const submitForm = async () => {
     setLoading(true);
     let link = "";
-    if (image) {
-      link = await uploadImage(image);
+    if (imageToUpload) {
+      link = await uploadImage(imageToUpload);
     }
+    const { name, description, price, type, image } =
+      productData as Partial<IProduct>;
     if (isUpdate) {
       updateProduct({
-        variables: { ...productData, image: link || productData?.image },
+        variables: {
+          name,
+          description,
+          price: Number(price),
+          type,
+          image: link || image,
+        },
       });
     } else {
       if (!link) {
         toast("Image is required", "error");
         return;
       }
-      createProduct({ variables: { ...productData } });
+
+      createProduct({
+        variables: {
+          name,
+          description,
+          price: Number(price),
+          type,
+          image: link,
+        },
+      });
     }
   };
   useEffect(() => {
@@ -129,7 +147,7 @@ const Index = () => {
                   type="file"
                   id="image"
                   onChange={(e) =>
-                    setImage(e.target.files && e.target.files[0])
+                    setImageToUpload(e.target.files && e.target.files[0])
                   }
                   className="absolute w-full h-full hidden"
                   accept="image/png"
