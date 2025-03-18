@@ -7,13 +7,12 @@ import { request } from "@/services/apiService";
 import { AxiosResponse } from "axios";
 import { useUtility } from "@/context/loaderContext";
 import { AnimatePresence, motion } from "framer-motion";
-import Image from "next/image";
-import p1 from "@/app/images/plant1.png";
 import { BRILLANT_REGULAR } from "@/app/fonts";
 import { uploadImage } from "@/utils/uploadImage";
+import { GET_PRODUCTS } from "@/graphql/queries";
+import { useQuery } from "@apollo/client";
 const Index = () => {
   const [visible, setVisible] = useState<boolean>(false);
-  const [products, setProduct] = useState<IProduct[]>([]);
   const { setLoading, toast } = useUtility();
   const [image, setImage] = useState<File | null>(null);
   const [productData, setProductData] = useState<Partial<IProduct> | null>({
@@ -24,6 +23,7 @@ const Index = () => {
     type: "plant",
   });
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
+
   const setProductToUpdate = (product: IProduct) => {
     setProductData(product);
     setIsUpdate(true);
@@ -39,17 +39,17 @@ const Index = () => {
       }
       if (isUpdate) {
         await request("product/manage", "put", productData);
-        setProduct((pre) => {
-          let elem = pre.find((item) => item._id === productData?._id);
-          if (elem && productData) {
-            elem.name = productData.name as string;
-            elem.type = productData.type as string;
-            elem.description = productData.description as string;
-            elem.price = productData.price as number;
-            elem.image = link || (productData.image as string);
-          }
-          return pre;
-        });
+        // setProduct((pre) => {
+        //   let elem = pre.find((item) => item._id === productData?._id);
+        //   if (elem && productData) {
+        //     elem.name = productData.name as string;
+        //     elem.type = productData.type as string;
+        //     elem.description = productData.description as string;
+        //     elem.price = productData.price as number;
+        //     elem.image = link || (productData.image as string);
+        //   }
+        //   return pre;
+        // });
         setVisible(false);
       } else {
         if (!link) {
@@ -60,10 +60,10 @@ const Index = () => {
           ...productData,
           image: link,
         });
-        setProduct((pre) => {
-          pre.push(res.data as IProduct);
-          return pre;
-        });
+        // setProduct((pre) => {
+        //   pre.push(res.data as IProduct);
+        //   return pre;
+        // });
       }
       setImagePreview(null);
       setImage(null);
@@ -87,26 +87,13 @@ const Index = () => {
     try {
       const res = await request(`product/${id}`, "delete");
       if (res.status === 200) {
-        setProduct((pre) => pre.filter((p) => String(p._id) != id));
+        // setProduct((pre) => pre.filter((p) => String(p._id) != id));
       }
     } catch (error) {
       console.log(error);
     }
   };
-  const getAllProducts = async () => {
-    try {
-      setLoading(true);
-      const res: AxiosResponse = await request("product/get");
-      setProduct(res.data);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-  useEffect(() => {
-    getAllProducts();
-  }, []);
+
   useEffect(() => {
     if (!visible) {
       setIsUpdate(false);
@@ -125,6 +112,10 @@ const Index = () => {
       setImagePreview(null);
     }
   }, [image]);
+  const { loading, error, data } = useQuery(GET_PRODUCTS);
+  if (loading) return <>Loading...</>;
+  if (error) return <>{error.message}</>;
+  const { products } = data;
   return (
     <>
       <Model
@@ -298,7 +289,7 @@ const Index = () => {
             <span className="w-[14.28%] text-center">Actions</span>
           </div>
           <AnimatePresence>
-            {products.map((product, index) => (
+            {products.map((product: IProduct, index: number) => (
               <motion.div
                 initial={{ opacity: 0, x: 10 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -315,7 +306,10 @@ const Index = () => {
                   # {index + 1}
                 </span>
                 <span className="w-[7%] flex justify-center border-r text-orange-500">
-                  <img src={product.image} className="h-12 w-12 rounded-full object-contain" />
+                  <img
+                    src={product.image}
+                    className="h-12 w-12 rounded-full object-contain"
+                  />
                 </span>
                 <span className="w-[18.56%] text-center border-r text-orange-500 capitalize">
                   {product.name}
@@ -330,7 +324,7 @@ const Index = () => {
                   className="w-[30.28%] px-2 border-r capitalize"
                   title={product.description}
                 >
-                  {product.description.slice(0, 60)}...
+                  {product.description?.slice(0, 60)}...
                 </span>
                 <span className="w-[14.28%] flex justify-center gap-2">
                   <span
