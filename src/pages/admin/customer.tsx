@@ -1,30 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Icon } from "@iconify/react";
 import { IUser } from "@/model/User";
 import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_USERS, DELETE_USER } from "@/graphql/queries";
+import { useUtility } from "@/context/loaderContext";
 
 const Index = () => {
-  const { loading, error, data, refetch } = useQuery(GET_USERS);
+  const { toast } = useUtility();
+  const { data, refetch } = useQuery(GET_USERS);
   const [deleteUser] = useMutation(DELETE_USER, {
-    onCompleted: () => refetch(),
+    onCompleted: () => {
+      refetch();
+      toast("User deleted successfully", "success");
+    },
+    onError: () => toast("Error deleting user", "error"),
   });
-  if (loading)
-    return (
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.3, type: "keyframes" }}
-        className="w-screen h-screen flex justify-center items-center loader backdrop-blur-sm"
-      >
-        <div className="lds-dual-ring"></div>
-      </motion.div>
-    );
-  if (error) return <p>Error: {error.message}</p>;
-  const { users } = data;
-  
+  useEffect(() => {
+    refetch();
+  }, []);
+
   const handleDelete = async (id: string) => {
     try {
       await deleteUser({ variables: { _id: id } });
@@ -49,8 +44,8 @@ const Index = () => {
             <span className="w-[14.28%] text-center">Actions</span>
           </div>
           <AnimatePresence>
-            {data &&
-              users.map((customer: Partial<IUser>, index: number) => (
+            {data ? (
+              data.users.map((customer: Partial<IUser>, index: number) => (
                 <motion.div
                   initial={{ opacity: 0, x: 10 }}
                   animate={{ opacity: 1, x: 0 }}
@@ -87,7 +82,17 @@ const Index = () => {
                     </span>
                   </span>
                 </motion.div>
-              ))}
+              ))
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex justify-center"
+              >
+                Loading
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>

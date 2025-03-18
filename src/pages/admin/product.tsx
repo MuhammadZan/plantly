@@ -9,8 +9,13 @@ import { useUtility } from "@/context/loaderContext";
 import { AnimatePresence, motion } from "framer-motion";
 import { BRILLANT_REGULAR } from "@/app/fonts";
 import { uploadImage } from "@/utils/uploadImage";
-import { GET_PRODUCTS } from "@/graphql/queries";
-import { useQuery } from "@apollo/client";
+import {
+  CREATE_PRODUCT,
+  DELETE_PRODUCT,
+  GET_PRODUCTS,
+  UPDATE_PRODUCT,
+} from "@/graphql/queries";
+import { useMutation, useQuery } from "@apollo/client";
 const Index = () => {
   const [visible, setVisible] = useState<boolean>(false);
   const { setLoading, toast } = useUtility();
@@ -30,76 +35,13 @@ const Index = () => {
     setVisible(true);
   };
 
-  const submitForm = async () => {
-    try {
-      setLoading(true);
-      let link = "";
-      if (image) {
-        link = await uploadImage(image);
-      }
-      if (isUpdate) {
-        await request("product/manage", "put", productData);
-        // setProduct((pre) => {
-        //   let elem = pre.find((item) => item._id === productData?._id);
-        //   if (elem && productData) {
-        //     elem.name = productData.name as string;
-        //     elem.type = productData.type as string;
-        //     elem.description = productData.description as string;
-        //     elem.price = productData.price as number;
-        //     elem.image = link || (productData.image as string);
-        //   }
-        //   return pre;
-        // });
-        setVisible(false);
-      } else {
-        if (!link) {
-          toast("Image is required", "error");
-          return;
-        }
-        const res: AxiosResponse = await request("product/manage", "post", {
-          ...productData,
-          image: link,
-        });
-        // setProduct((pre) => {
-        //   pre.push(res.data as IProduct);
-        //   return pre;
-        // });
-      }
-      setImagePreview(null);
-      setImage(null);
-      setProductData({
-        image: "",
-        description: "",
-        price: 0,
-        type: "plant",
-        name: "",
-      });
-      setVisible(false);
-    } catch (error) {
-      toast("Something went wrong", "error");
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deleteProduct = async (id: string) => {
-    try {
-      const res = await request(`product/${id}`, "delete");
-      if (res.status === 200) {
-        // setProduct((pre) => pre.filter((p) => String(p._id) != id));
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   useEffect(() => {
     if (!visible) {
       setIsUpdate(false);
       setProductData(null);
     }
   }, [visible]);
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   useEffect(() => {
     if (image) {
@@ -112,10 +54,61 @@ const Index = () => {
       setImagePreview(null);
     }
   }, [image]);
-  const { loading, error, data } = useQuery(GET_PRODUCTS);
-  if (loading) return <>Loading...</>;
-  if (error) return <>{error.message}</>;
-  const { products } = data;
+  const { loading, error, data, refetch } = useQuery(GET_PRODUCTS);
+  const [deleteProduct] = useMutation(DELETE_PRODUCT, {
+    onCompleted: () => {
+      refetch();
+      toast("Product deleted successfully", "success");
+    },
+    onError: () => toast("Error deleting product", "error"),
+  });
+  const [createProduct] = useMutation(CREATE_PRODUCT, {
+    onCompleted: () => {
+      refetch();
+      toast("Product Created successfully", "success");
+      setVisible(false);
+      setLoading(false);
+    },
+    onError: () => {
+      toast("Error creating product", "error");
+      setVisible(false);
+      setLoading(false);
+    },
+  });
+  const [updateProduct] = useMutation(UPDATE_PRODUCT, {
+    onCompleted: () => {
+      refetch();
+      toast("Product updated successfully", "success");
+      setVisible(false);
+      setLoading(false);
+    },
+    onError: () => {
+      toast("Error creating product", "error");
+      setVisible(false);
+      setLoading(false);
+    },
+  });
+  const submitForm = async () => {
+    setLoading(true);
+    let link = "";
+    if (image) {
+      link = await uploadImage(image);
+    }
+    if (isUpdate) {
+      updateProduct({
+        variables: { ...productData, image: link || productData?.image },
+      });
+    } else {
+      if (!link) {
+        toast("Image is required", "error");
+        return;
+      }
+      createProduct({ variables: { ...productData } });
+    }
+  };
+  useEffect(() => {
+    refetch();
+  }, []);
   return (
     <>
       <Model
@@ -289,69 +282,82 @@ const Index = () => {
             <span className="w-[14.28%] text-center">Actions</span>
           </div>
           <AnimatePresence>
-            {products.map((product: IProduct, index: number) => (
-              <motion.div
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{
-                  type: "keyframes",
-                  duration: 0.3,
-                  delay: index / 10,
-                }}
-                exit={{ opacity: 0, x: -10 }}
-                key={index}
-                className="flex rounded-lg shadow-lg w-full justify-between px-5 py-3 items-center"
-              >
-                <span className="w-[5%] text-center border-r capitalize">
-                  # {index + 1}
-                </span>
-                <span className="w-[7%] flex justify-center border-r text-orange-500">
-                  <img
-                    src={product.image}
-                    className="h-12 w-12 rounded-full object-contain"
-                  />
-                </span>
-                <span className="w-[18.56%] text-center border-r text-orange-500 capitalize">
-                  {product.name}
-                </span>
-                <span className="w-[14.28%] text-center border-r capitalize">
-                  {product.type}
-                </span>
-                <span className="w-[10%] text-center border-r capitalize">
-                  $ {product.price}
-                </span>
-                <span
-                  className="w-[30.28%] px-2 border-r capitalize"
-                  title={product.description}
+            {data ? (
+              data.products.map((product: IProduct, index: number) => (
+                <motion.div
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{
+                    type: "keyframes",
+                    duration: 0.3,
+                    delay: index / 10,
+                  }}
+                  exit={{ opacity: 0, x: -10 }}
+                  key={index}
+                  className="flex rounded-lg shadow-lg w-full justify-between px-5 py-3 items-center"
                 >
-                  {product.description?.slice(0, 60)}...
-                </span>
-                <span className="w-[14.28%] flex justify-center gap-2">
-                  <span
-                    className="p-2 rounded-lg border bg-gray-50 shadow-lg cursor-pointer"
-                    onClick={() => {
-                      deleteProduct(String(product._id));
-                    }}
-                  >
-                    <Icon
-                      icon="weui:delete-on-filled"
-                      className="w-5 h-5 text-primary"
+                  <span className="w-[5%] text-center border-r capitalize">
+                    # {index + 1}
+                  </span>
+                  <span className="w-[7%] flex justify-center border-r text-orange-500">
+                    <img
+                      src={product.image}
+                      className="h-12 w-12 rounded-full object-contain"
                     />
                   </span>
-                  <span
-                    className="p-2 rounded-lg border bg-gray-50 shadow-lg cursor-pointer"
-                    onClick={() => {
-                      setProductToUpdate(product);
-                    }}
-                  >
-                    <Icon
-                      icon="flowbite:edit-outline"
-                      className="w-5 h-5 text-primary"
-                    />
+                  <span className="w-[18.56%] text-center border-r text-orange-500 capitalize">
+                    {product.name}
                   </span>
-                </span>
+                  <span className="w-[14.28%] text-center border-r capitalize">
+                    {product.type}
+                  </span>
+                  <span className="w-[10%] text-center border-r capitalize">
+                    $ {product.price}
+                  </span>
+                  <span
+                    className="w-[30.28%] px-2 border-r capitalize"
+                    title={product.description}
+                  >
+                    {product.description?.slice(0, 60)}...
+                  </span>
+                  <span className="w-[14.28%] flex justify-center gap-2">
+                    <span
+                      className="p-2 rounded-lg border bg-gray-50 shadow-lg cursor-pointer"
+                      onClick={() => {
+                        deleteProduct({
+                          variables: { _id: String(product._id) },
+                        });
+                      }}
+                    >
+                      <Icon
+                        icon="weui:delete-on-filled"
+                        className="w-5 h-5 text-primary"
+                      />
+                    </span>
+                    <span
+                      className="p-2 rounded-lg border bg-gray-50 shadow-lg cursor-pointer"
+                      onClick={() => {
+                        setProductToUpdate(product);
+                      }}
+                    >
+                      <Icon
+                        icon="flowbite:edit-outline"
+                        className="w-5 h-5 text-primary"
+                      />
+                    </span>
+                  </span>
+                </motion.div>
+              ))
+            ) : (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex justify-center"
+              >
+                Loading
               </motion.div>
-            ))}
+            )}
           </AnimatePresence>
         </div>
       </div>
