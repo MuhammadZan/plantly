@@ -83,8 +83,8 @@ const Index = () => {
       setVisible(false);
       setLoading(false);
     },
-    onError: () => {
-      toast("Error updating product", "error");
+    onError: (error) => {
+      toast(error.message, "error");
       setVisible(false);
       setLoading(false);
     },
@@ -95,11 +95,12 @@ const Index = () => {
     if (imageToUpload) {
       link = await uploadImage(imageToUpload);
     }
-    const { name, description, price, type, image } =
+    const { _id, name, description, price, type, image } =
       productData as Partial<IProduct>;
     if (isUpdate) {
       updateProduct({
         variables: {
+          _id,
           name,
           description,
           price: Number(price),
@@ -263,7 +264,9 @@ const Index = () => {
       />
       <div className="px-5 w-full mb-10`">
         <div className="flex justify-between items-between">
-          <h1 className="text-2xl font-bold">Products</h1>
+          <h1 className={"text-2xl font-bold " + BRILLANT_REGULAR.className}>
+            Products
+          </h1>
           <div>
             <Button
               text="Add Product"
@@ -319,7 +322,7 @@ const Index = () => {
                   </span>
                   <span className="w-[7%] flex justify-center border-r text-orange-500">
                     <img
-                      src={product.image}
+                      src={product?.image || ""}
                       className="h-12 w-12 rounded-full object-contain"
                     />
                   </span>
@@ -330,7 +333,7 @@ const Index = () => {
                     {product.type}
                   </span>
                   <span className="w-[10%] text-center border-r capitalize">
-                    $ {product.price}
+                    RS. {product.price}/-
                   </span>
                   <span
                     className="w-[30.28%] px-2 border-r capitalize"

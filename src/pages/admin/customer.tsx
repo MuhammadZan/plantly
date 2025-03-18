@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useMutation, useQuery } from "@apollo/client";
 import { GET_USERS, DELETE_USER } from "@/graphql/queries";
 import { useUtility } from "@/context/loaderContext";
+import { BRILLANT_REGULAR } from "@/app/fonts";
 
 const Index = () => {
   const { toast } = useUtility();
@@ -31,7 +32,9 @@ const Index = () => {
     <>
       <div className="px-5 w-full mb-10`">
         <div className="flex justify-between items-between">
-          <h1 className="text-2xl font-bold">Customers</h1>
+          <h1 className={"text-2xl font-bold " + BRILLANT_REGULAR.className}>
+            Customers
+          </h1>
           <div></div>
         </div>
 

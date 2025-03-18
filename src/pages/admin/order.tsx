@@ -8,6 +8,7 @@ import { useUtility } from "@/context/loaderContext";
 import { AnimatePresence, motion } from "framer-motion";
 import Button from "@/components/globals/button";
 import { AxiosResponse } from "axios";
+import { BRILLANT_REGULAR } from "@/app/fonts";
 const Index = () => {
   const { setLoading } = useUtility();
   const [order, setOrder] = useState<IOrder[]>([]);
@@ -77,28 +78,40 @@ const Index = () => {
       <Model
         componenet={
           <div className="p-5">
-            <h1 className="text-xl font-bold text-primary mb-5 text-center">
+            <h1
+              className={
+                "text-xl font-bold text-primary mb-5 " +
+                BRILLANT_REGULAR.className
+              }
+            >
               Items
             </h1>
-            {items.map((item, index) => (
-              <div
-                key={index}
-                className="flex p-5 rounded bg-slate-50 gap-5 relative mt-5"
-              >
-                <span className="bg-primary text-white font-bold rounded-full p-3 text-sm absolute w-[15px] h-[15px] flex justify-center items-center -top-2 -left-2">
-                  {item.quantity}
-                </span>
-                <img
-                  src={item.product.image}
-                  className="w-[100px] h-[100px] object-contain"
-                  alt="pizza card"
-                />
-                <div>
-                  <h1 className="text-xl font-semibold">{item.product.name}</h1>
-                  <p className="text-[12px]">{item.product.description}</p>
-                </div>
-              </div>
-            ))}
+            {items.map(
+              (item, index) =>
+                item.product && (
+                  <div
+                    key={index}
+                    className="flex p-5 rounded bg-slate-50 gap-5 relative mt-5"
+                  >
+                    <span className="bg-primary text-white font-bold rounded-full p-3 text-sm absolute w-[15px] h-[15px] flex justify-center items-center -top-2 -left-2">
+                      {item.quantity}
+                    </span>
+                    <img
+                      src={item.product.image || ""}
+                      className="w-[100px] h-[100px] object-contain"
+                      alt="pizza card"
+                    />
+                    <div>
+                      <h1 className="text-xl font-semibold">
+                        {item.product.name || ""}
+                      </h1>
+                      <p className="text-[12px]">
+                        {item.product.description.slice(0, 70) || ""}...
+                      </p>
+                    </div>
+                  </div>
+                )
+            )}
           </div>
         }
         visible={visible}
@@ -147,7 +160,9 @@ const Index = () => {
         setVisible={setUpdateModel}
       />
       <div className="px-5 w-full mb-10`">
-        <h1 className="text-2xl font-bold">Order History</h1>
+        <h1 className={"text-2xl font-bold " + BRILLANT_REGULAR.className}>
+          Order History
+        </h1>
         <div className="flex gap-5 mt-10 border-b-2 pb-3">
           <div className="text-primary font-semibold relative cursor-pointer">
             All Orders
@@ -193,7 +208,7 @@ const Index = () => {
                   {o.status}
                 </span>
                 <span className="w-[14.28%] text-center border-r">
-                  $ {o.totalBill}
+                  RS. {o.totalBill}/-
                 </span>
                 <span className="w-[14.28%] flex justify-center gap-2">
                   <span
