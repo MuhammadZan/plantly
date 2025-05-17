@@ -7,10 +7,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectToDb();
-    const user: IUser | null = await authenticateUser(req);
-    if (!user) {
-      return response(res, 401, { message: "Unauthenticated request" });
-    }
+   
     if (req.method?.toLocaleLowerCase() === "put") {
       const { _id, status }: Partial<IOrder> = req.body;
       const order = await Order.findByIdAndUpdate(_id, { status });

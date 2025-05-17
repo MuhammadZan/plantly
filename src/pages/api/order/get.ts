@@ -7,10 +7,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectToDb();
-    const user: IUser | null = await authenticateUser(req);
-    if (!user) {
-      return response(res, 401, { message: "Unauthenticated request" });
-    }
     const orders = await Order.find()
       .populate("userId")
       .populate("items.product")

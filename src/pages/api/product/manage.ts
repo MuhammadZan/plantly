@@ -7,10 +7,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectToDb();
-    const user: IUser | null = await authenticateUser(req);
-    if (!user) {
-      return response(res, 401, { message: "Authentication failed" });
-    }
     if (req.method?.toLocaleLowerCase() === "post") {
       const { name, price, description, image, type }: Partial<IProduct> =
         req.body;

@@ -7,10 +7,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectToDb();
-    const user: IUser | null = await authenticateUser(req);
-    if (!user) {
-      return response(res, 401, { message: "Authentication failed" });
-    }
     if (req.method?.toLowerCase() === "delete") {
       const { id }: Partial<IProduct> = req.query;
       await Product.findByIdAndDelete(id);
