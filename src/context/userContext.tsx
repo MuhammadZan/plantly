@@ -1,6 +1,6 @@
 import { IUser } from "@/model/User";
 import { request } from "@/services/apiService";
-import { AxiosResponse } from "axios";
+// import { AxiosResponse } from "axios";
 import React, {
   createContext,
   useContext,
@@ -15,7 +15,7 @@ import Image from "next/image";
 import plant from "@/app/images/login-img.jpeg";
 import { BRILLANT_REGULAR } from "@/app/fonts";
 import Button from "@/components/globals/button";
-import Link from "next/link";
+// import Link from "next/link";
 import { Icon, Logout } from "@/components/Icons";
 interface IUserProvider {
   children: ReactNode;
@@ -56,14 +56,14 @@ export const UserProvider: React.FC<IUserProvider> = ({ children }) => {
       setLoading(false);
     }
   };
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      getInfo();
-    } else {
-      router.push("/");
-    }
-  }, []);
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     getInfo();
+  //   } else {
+  //     router.push("/");
+  //   }
+  // }, []);
 
   const login = async () => {
     try {
